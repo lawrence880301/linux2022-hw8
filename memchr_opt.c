@@ -50,26 +50,28 @@ void *memchr_opt(const void *src_void, int c, size_t length)
          * word-sized block of the search character and then detecting for the
          * presence of NULL in the result.
          */
+         //0~128 asrc
         unsigned long *asrc = (unsigned long *) src;
+        //double char mask
         unsigned long mask = d << 8 | d;
+        //32 bit mask
         mask = mask << 16 | mask;
+        //64 bit mask
         for (unsigned int i = 32; i < LBLOCKSIZE * 8; i <<= 1)
             mask = (mask << i) | mask;
 
         while (length >= LBLOCKSIZE) {
             /* XXXXX: Your implementation should appear here */
             /*break loop if this segment contains the search character*/
+            /*using DETECT_CHAR check if target exist*/
             if(DETECT_CHAR(*asrc, mask))
                 break;
             
-            /*finding search character in next segment*/
+            /*finding search character in next segment, increment by the size of long*/
             asrc++;
             length -= LBLOCKSIZE;
         }
 
-        /* If there are fewer than LBLOCKSIZE characters left, then we resort to
-         * the bytewise loop.
-         */
         src = (unsigned char *) asrc;
     }
 
